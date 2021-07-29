@@ -37,7 +37,7 @@ function Webhook(url) {
  * @return {void} `void`
  */
 function DiscordLogger(appName, webhookURL){
-    let webhook = WebhookURL? Webhook(webhookURL): null;
+    let webhook = webhookURL? Webhook(webhookURL): null;
 
     let builtins = {
         log: console.log,
