@@ -9,5 +9,9 @@
     "logger"
   ],
   "author": "JulianWebb",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/JulianWebb/discord-logger.git"
+  }
 }
