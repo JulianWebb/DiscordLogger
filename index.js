@@ -1,9 +1,4 @@
-let WebhookClient;
-try {
-    ({ WebhookClient } = require('discord.js'));
-} catch (exception) {
-    console.log("discord.js not found, continuing without");
-}
+const HTTPS = require('https');
 
 function timestamp() {
     let now = new Date();
@@ -14,17 +9,35 @@ function timestamp() {
     return `[${stringHour}:${stringMinute}]`;
 }
 
+function Webhook(url) {
+    let options = {
+        hostname: 'discord.com',
+        port: 443,
+        path: url.replace("https://discord.com", ""),
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }
+    return (message) => {
+        const request = HTTPS.request(options, response => {
+            response.on("data", responseData => process.stdout.write(responseData))
+        })
+
+        request.on("error", error => process.stdout.write(error))
+        request.write(JSON.stringify({ content: message }));
+        request.end();
+    }
+}
+
 /**
  * Wrap Console Functions
  * @param {string} [appName] Identifer to use in the logs
- * @param {Object} [webhookAuth] Authorization for the webhook
- * @param {string} webhookAuth.id Webhook ID
- * @param {string} webhookAuth.token Webhook Token
+ * @param {string} [webhookURL] The URL for the Webhook
  * @return {void} `void`
  */
-function DiscordLogger(appName, webhookAuth){
-    let webhook = undefined;
-    if (WebhookClient) webhook = webhookAuth? new WebhookClient(webhookAuth.id, webhookAuth.token): undefined;
+function DiscordLogger(appName, webhookURL){
+    let webhook = WebhookURL? Webhook(webhookURL): null;
 
     let builtins = {
         log: console.log,
@@ -41,7 +54,7 @@ function DiscordLogger(appName, webhookAuth){
                     return accumulator + current.toString() + "      ";
                 }, "").trim();
 
-                webhook.send(`\`${prefix} ${message}\``);
+                webhook(`\`${prefix} ${message}\``);
             }
         }
     }
